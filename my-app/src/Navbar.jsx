@@ -6,7 +6,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 
 function NavbarComponent({ handlePlotTypeChange }) {
   return (
-    <Navbar bg="light" expand="lg" style={{ width: '100%' }}>
+    <Navbar bg="dark" data-bs-theme="dark" expand="lg" style={{ width: '100%' }}>
       <Container>
         <Navbar.Brand href="#">Climate Visualizer</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -18,7 +18,7 @@ function NavbarComponent({ handlePlotTypeChange }) {
           {/* Dropdown for selecting plot type */}
           <Form>
             <Form.Group controlId="plotTypeSelector">
-              <Form.Label style={{ marginRight: '10px' }}>Select Plot Type:</Form.Label>
+              <Form.Label style={{ marginRight: '10px', color: "white" }}>Select Plot Type:</Form.Label>
               <Form.Select onChange={handlePlotTypeChange} style={{ width: '200px' }}>
                 <option value="single">Single Plot</option>
                 <option value="dual">Dual Plot</option>
