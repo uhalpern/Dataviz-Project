@@ -94,7 +94,6 @@ function App() {
 
   return (
     <div>
-      <h1>Climate Variable Visualizer</h1>
       {/* div to hold the Plotly plot */}
       <div ref={plotDiv} />
     </div>
