@@ -1,119 +1,28 @@
 import * as d3 from 'd3';
+import { init, transposeData } from './data_helper_functions.js';
 
 export async function loadAndProcessData() {
-  const data = await d3.csv('/married.csv');
-  const married_parsed = data.map(row => ({
-    ...row,  // Spread the original row to keep other fields intact
-    "Total Married": parseInt(row["Total Married"].replace(/,/g, ''), 10),
-    "Married couple households": parseInt(row["Married couple households"].replace(/,/g, ''), 10),
-    "Married couple households Opposite-sex": parseInt(row["Married couple households Opposite-sex"].replace(/,/g, ''), 10),
-    "Married couple households Same-sex": parseInt(row["Married couple households Same-sex"].replace(/,/g, ''), 10),
-  }));
 
-  const TO_NAME = 1;
-  const TO_ABBREVIATED = 2;
-  function convertRegion(input, to) {
-    var states = [
-      ['Alabama', 'AL'],
-      ['Alaska', 'AK'],
-      ['American Samoa', 'AS'],
-      ['Arizona', 'AZ'],
-      ['Arkansas', 'AR'],
-      ['Armed Forces Americas', 'AA'],
-      ['Armed Forces Europe', 'AE'],
-      ['Armed Forces Pacific', 'AP'],
-      ['California', 'CA'],
-      ['Colorado', 'CO'],
-      ['Connecticut', 'CT'],
-      ['Delaware', 'DE'],
-      ['District Of Columbia', 'DC'],
-      ['Florida', 'FL'],
-      ['Georgia', 'GA'],
-      ['Guam', 'GU'],
-      ['Hawaii', 'HI'],
-      ['Idaho', 'ID'],
-      ['Illinois', 'IL'],
-      ['Indiana', 'IN'],
-      ['Iowa', 'IA'],
-      ['Kansas', 'KS'],
-      ['Kentucky', 'KY'],
-      ['Louisiana', 'LA'],
-      ['Maine', 'ME'],
-      ['Marshall Islands', 'MH'],
-      ['Maryland', 'MD'],
-      ['Massachusetts', 'MA'],
-      ['Michigan', 'MI'],
-      ['Minnesota', 'MN'],
-      ['Mississippi', 'MS'],
-      ['Missouri', 'MO'],
-      ['Montana', 'MT'],
-      ['Nebraska', 'NE'],
-      ['Nevada', 'NV'],
-      ['New Hampshire', 'NH'],
-      ['New Jersey', 'NJ'],
-      ['New Mexico', 'NM'],
-      ['New York', 'NY'],
-      ['North Carolina', 'NC'],
-      ['North Dakota', 'ND'],
-      ['Northern Mariana Islands', 'NP'],
-      ['Ohio', 'OH'],
-      ['Oklahoma', 'OK'],
-      ['Oregon', 'OR'],
-      ['Pennsylvania', 'PA'],
-      ['Puerto Rico', 'PR'],
-      ['Rhode Island', 'RI'],
-      ['South Carolina', 'SC'],
-      ['South Dakota', 'SD'],
-      ['Tennessee', 'TN'],
-      ['Texas', 'TX'],
-      ['US Virgin Islands', 'VI'],
-      ['Utah', 'UT'],
-      ['Vermont', 'VT'],
-      ['Virginia', 'VA'],
-      ['Washington', 'WA'],
-      ['West Virginia', 'WV'],
-      ['Wisconsin', 'WI'],
-      ['Wyoming', 'WY'],
-    ];
+  // Read in raw datasets
+  const raw_precip_data = await d3.csv('/avg_precipitation.csv');
+  const raw_temp_data = await d3.csv('/solar_irradiance.csv');
+  const raw_irrad_data = await d3.csv('/solar_irradiance.csv');
 
-    if (to === TO_ABBREVIATED) {
-      input = input.replace(/\w\S*/g, function (txt) {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-      });
-      for (let i = 0; i < states.length; i++) {
-        if (states[i][0] === input) {
-          return states[i][1];
-        }
-      }
-    } else if (to === TO_NAME) {
-      input = input.toUpperCase();
-      for (let i = 0; i < states.length; i++) {
-        if (states[i][1] === input) {
-          return states[i][0];
-        }
-      }
-    }
-    return input; // In case of no match, return the input as-is
-  }
 
-  // Mapping the function to "State name" field in married_parsed
-  let married_parsed2 = married_parsed.map(row => {
-    return {
-      ...row,
-      "State_abb": convertRegion(row["State name"], TO_ABBREVIATED)  // Converting to abbreviated form
-    };
-  });
+  // Transform datasets to have parameter, year, and data fields
+  // data field will have lat, lon, and value field
+  const mod_precip = init(raw_precip_data);
+  const mod_temp_data = init(raw_temp_data);
+  const mod_irrad_data = init(raw_irrad_data);
 
-  //console.log(married_parsed2)
+  // Transpose data so that every row is a year
+  // transforms into optimal format for year slider
+  const transposed_precip = transposeData(mod_precip);
+  const transposed_temp = transposeData(mod_temp_data);
+  const transposed_irrad = transposeData(mod_irrad_data);
 
-  const married_final = married_parsed2.map((row, count) => {
-    return {
-      ...row,  // Spread the original row to keep other fields intact
-      "OBJECTID": count  // Add 1 if you want OBJECTID to start from 1 instead of 0
-    };
-  });
+  const datasets = {transposed_precip, transposed_temp, transposed_irrad};
+  console.log(datasets);
 
-  console.log(married_final)
-
-  return married_final
+  return datasets;
 }
