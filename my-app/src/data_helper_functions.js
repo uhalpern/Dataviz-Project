@@ -26,12 +26,15 @@ export function init(data) {
     result.push({
       // Object Keys: "PARAMETER", "LAT", "LON", and "DATA"
       "PARAMETER": unique.PARAMETER,
-      "LAT": unique.LAT,
-      "LON": unique.LON,
+      "LAT": parseFloat(unique.LAT),
+      "LON": parseFloat(unique.LON),
       "DATA": matchingRecords.map(record => {
         // Return only the fields you want to keep in the "DATA" array (e.g., VALUE)
         const { PARAMETER, LAT, LON, ...rest } = record;  // Destructure to exclude PARAMETER, LAT, LON
-        return rest;  // Return the rest of the fields (e.g., VALUE)
+        const convertedRest = Object.fromEntries(
+          Object.entries(rest).map(([key, value]) => [key, parseFloat(value)])
+        );
+        return convertedRest;
       })
     });
   }
@@ -54,5 +57,35 @@ export function transposeData(processedData) {
     }))
   }));
 
-  return transposedData
+  return transposedData;
 }
+
+export function getMinMax(dataset)  {
+  // return an array of years where for each year we have an array of temperatures for the lat/lons
+  let unflat = dataset.map(row => {
+    let yearTemp = row.Data.map(data => data.Value);
+    return yearTemp;
+  });
+
+  // flatten array so that we can apply operations on all values
+  const flattened = unflat.flat();
+
+  // Remove 0s since they represent missing values
+  const fliteredFlattned = flattened.filter(value => value !== 0)
+
+  // min and max values will be based on one standard deviation away from mean in both directions
+  const mean = d3.mean(fliteredFlattned);
+  const sd = d3.deviation(fliteredFlattned);
+
+  const max_val = mean + sd;
+
+  // Make sure min_val is not below 0
+  const min_val = mean - (2 * sd);
+  const min_vals = [min_val, 0];
+  const real_minval = d3.max(min_vals);
+
+  return {
+    zmax: max_val,
+    zmin: real_minval
+  };
+};

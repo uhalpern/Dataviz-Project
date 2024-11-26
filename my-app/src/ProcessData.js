@@ -5,9 +5,11 @@ export async function loadAndProcessData() {
 
   // Read in raw datasets
   const raw_precip_data = await d3.csv('/avg_precipitation.csv');
-  const raw_temp_data = await d3.csv('/solar_irradiance.csv');
+  const raw_temp_data = await d3.csv('/surface_temperature.csv');
   const raw_irrad_data = await d3.csv('/solar_irradiance.csv');
 
+  console.log("raw data:");
+  console.log(raw_temp_data);
 
   // Transform datasets to have parameter, year, and data fields
   // data field will have lat, lon, and value field
