@@ -4,7 +4,12 @@ import Nav from 'react-bootstrap/Nav';
 import Form from 'react-bootstrap/Form';
 import Dropdown from 'react-bootstrap/Dropdown';
 
-function NavbarComponent({ handlePlotTypeChange }) {
+function NavbarComponent({ setIsDualPlot }) {
+  const handlePlotTypeChange = (event) => {
+    const selectedValue = event.target.value;
+    setIsDualPlot(selectedValue === 'dual'); // Set to true if "dual", false otherwise
+  };
+
   return (
     <Navbar bg="dark" data-bs-theme="dark" expand="lg" style={{ width: '100%' }}>
       <Container>

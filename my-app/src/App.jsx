@@ -5,6 +5,7 @@ import './App.css'
 
 // Import your Plot component
 import Plot from './Plot.jsx';
+import DualPlot from './DualPlot.jsx';
 //import DualPlot from './DualPlot'; // Dual-plot component
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
@@ -21,7 +22,7 @@ function App() {
 
   return (
     <Container fluid style={{ padding: 0 }}>
-      <NavbarComponent />
+      <NavbarComponent setIsDualPlot={setIsDualPlot} />
       <Container
         style={{
           display: 'flex',
@@ -33,7 +34,7 @@ function App() {
         }}
       >
         <h1>Climate Variable Visualizer</h1>
-        <Plot />
+        {isDualPlot ? <DualPlot /> : <Plot />} {/* If isDualPlot is true, display dual plot else,  */}
       </Container>
     </Container>
   )

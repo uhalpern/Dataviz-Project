@@ -50,7 +50,7 @@ function App() {
         z: currentDataset[0].Data.map(row => row.Value), // Initial z values
         colorscale: 'Portland', // Consistent colorscale
         radius: 50,
-        opacity: 0.5,
+        opacity: 0.4,
         zmin: currentMinMax.zmin, // Explicit minimum for colorscale
         zmax: currentMinMax.zmax // Explicit maximum for colorscale
       }];

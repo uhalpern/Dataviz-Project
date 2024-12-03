@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Container, Row, Col } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 
 function DualPlot() {
