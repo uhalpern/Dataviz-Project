@@ -1,11 +1,9 @@
 import React, { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 // Import your Plot component
 import Plot from './Plot.jsx';
-import DualPlot from './DualPlot.jsx';
+import DualPlot from './DualPlot2.jsx';
 //import DualPlot from './DualPlot'; // Dual-plot component
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';

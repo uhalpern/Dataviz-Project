@@ -2,17 +2,18 @@ import React, { useEffect, useRef } from 'react';
 import Plotly from 'plotly.js-dist';
 import { loadAndProcessData } from './ProcessData.js';
 import { get_globalLatLons, generateSteps} from './plot_helper_functions.js';
-import { annotations } from './annotations';
+import { createAnnotations } from './annotations';
 import { createUpdateMenus } from './updateMenus';
 import { getMinMax } from './data_helper_functions.js';
 
-function App() {
+function Plot() {
   const plotDiv = useRef(null);
 
   useEffect(() => {
     async function fetchDataAndRenderPlot() {
       // Fetch datasets
       const variableButtonHeight = 1.0;
+      const variableButtonWidth = 0;
       const colorscaleButtonHeight = 1.0;
       const colorscaleButtonWidth = 1.2;
 
@@ -20,14 +21,21 @@ function App() {
       console.log("datasets:");
       console.log(datasets);
       const global_lat_lons = get_globalLatLons(datasets.transposed_temp);
-      console.log("lat_lons:")
-      console.log(global_lat_lons);
+      //console.log("lat_lons:")
+      //console.log(global_lat_lons);
       const currentDataset = datasets.transposed_temp;
       const currentMinMax = getMinMax(currentDataset);
       const precipMinMax = getMinMax(datasets.transposed_precip);
       const irradMinMax = getMinMax(datasets.transposed_irrad);
 
+      //let specific_year = currentDataset.filter(row => row.Year === 1994);
+      //console.log("specific year (1994):");
+      //console.log(specific_year);
+
       let steps = generateSteps(currentDataset);
+
+      const annotations = createAnnotations(variableButtonHeight, variableButtonWidth,
+        colorscaleButtonHeight, colorscaleButtonWidth)
 
       const updateMenu = createUpdateMenus(datasets, precipMinMax, variableButtonHeight, colorscaleButtonWidth, colorscaleButtonHeight);
 
@@ -100,4 +108,4 @@ function App() {
   );
 }
 
-export default App;
+export default Plot;
