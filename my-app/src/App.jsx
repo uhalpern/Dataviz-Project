@@ -21,17 +21,17 @@ function App() {
   return (
     <Container fluid style={{ padding: 0 }}>
       <NavbarComponent setIsDualPlot={setIsDualPlot} />
+      <h1 style={{marginTop: "40px"}}>Climate Variable Visualizer</h1>
       <Container
         style={{
           display: 'flex',
           flexDirection: 'column',   // Stack items vertically (header above plot)
-          justifyContent: 'center', // Horizontally centers content
+          marginTop: "200px",
           alignItems: 'center',     // Vertically centers content
           minHeight: '100vh',       // Ensures full viewport height for centering
           textAlign: 'center',      // Centers text horizontally inside the container
         }}
       >
-        <h1>Climate Variable Visualizer</h1>
         {isDualPlot ? <DualPlot /> : <Plot />} {/* If isDualPlot is true, display dual plot else,  */}
       </Container>
     </Container>

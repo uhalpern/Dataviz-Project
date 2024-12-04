@@ -9,64 +9,67 @@ import { createDualUpdateMenus } from './dualupdateMenus.js';
 function DualPlot() {
   const plotDiv = useRef(null);
 
-  // Add state for the current dataset
   const [datasets, setDatasets] = useState(null);
   const [currentDataset, setCurrentDataset] = useState(null);
+  const [year1, setYear1] = useState(null);
+  const [year2, setYear2] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
       const loadedDatasets = await loadAndProcessData();
       setDatasets(loadedDatasets);
       setCurrentDataset(loadedDatasets.transposed_temp); // Default dataset
+
+      setYear1(1984);
+      setYear2(2022);
     }
 
     fetchData();
   }, []);
 
   useEffect(() => {
-    if (!currentDataset || !datasets) return;
+    if (!currentDataset || !datasets || !year1 || !year2) return;
 
     const currentMinMax = getMinMax(currentDataset);
-    const colorscaleButtonHeight = 0.5;
-    const colorscaleButtonWidth = 0.5;
-
-    // Select two different years (example: 1994 and 2020)
-    const year1 = currentDataset.filter((row) => row.Year === 1984);
-    const year2 = currentDataset.filter((row) => row.Year === 2022);
-    console.log("year1", year1)
-
     const global_lat_lons = get_globalLatLons(currentDataset);
 
-    const updateMenu = createDualUpdateMenus( colorscaleButtonWidth, colorscaleButtonHeight);
-    console.log("Update menu")
-    console.log(updateMenu)
+    const selectedYear1 = currentDataset.filter((row) => row.Year === year1);
+    const selectedYear2 = currentDataset.filter((row) => row.Year === year2);
+
+    const updateMenu = createDualUpdateMenus(1.12, 0.9);
+    const annotations = createdualAnnotations(
+      0.9,
+      1.12,
+      year1,
+      year2
+    );
 
     const data = [
       {
         type: 'densitymapbox',
-        lon: year1[0].Data.map((row) => row.LON),
-        lat: year1[0].Data.map((row) => row.LAT),
-        z: year1[0].Data.map((row) => row.Value),
+        lon: selectedYear1[0].Data.map((row) => row.LON),
+        lat: selectedYear1[0].Data.map((row) => row.LAT),
+        z: selectedYear1[0].Data.map((row) => row.Value),
         colorscale: 'Viridis',
         radius: 50,
         opacity: 0.4,
         zmin: currentMinMax.zmin,
         zmax: currentMinMax.zmax,
         subplot: 'mapbox',
-        name: '1994',
+        name: `${year1}`,
       },
       {
         type: 'densitymapbox',
-        lon: year2[0].Data.map((row) => row.LON),
-        lat: year2[0].Data.map((row) => row.LAT),
-        z: year2[0].Data.map((row) => row.Value),
+        lon: selectedYear2[0].Data.map((row) => row.LON),
+        lat: selectedYear2[0].Data.map((row) => row.LAT),
+        z: selectedYear2[0].Data.map((row) => row.Value),
         colorscale: 'Viridis',
         radius: 50,
         opacity: 0.4,
         zmin: currentMinMax.zmin,
         zmax: currentMinMax.zmax,
         subplot: 'mapbox2',
-        name: '2020',
+        name: `${year2}`,
       },
     ];
 
@@ -76,6 +79,7 @@ function DualPlot() {
       margin: { t: 40, r: 40, b: 40, l: 40 },
       title: `${currentDataset[0].Parameter} Density Map Comparison`,
       updatemenus: updateMenu,
+      annotations: annotations,
       grid: {
         rows: 1,
         columns: 3,
@@ -102,20 +106,55 @@ function DualPlot() {
     };
 
     Plotly.newPlot(plotDiv.current, data, layout);
-  }, [currentDataset]);
+  }, [currentDataset, year1, year2]);
 
   return (
     <div>
       <div ref={plotDiv} style={{ minHeight: '500px', minWidth: '900px' }} />
-      <div>
+      <div style={{ padding: "5px"}}>
         {datasets && (
           <>
-            <button onClick={() => setCurrentDataset(datasets.transposed_temp)}>Temperature</button>
-            <button onClick={() => setCurrentDataset(datasets.transposed_precip)}>Precipitation</button>
-            <button onClick={() => setCurrentDataset(datasets.transposed_irrad)}>Solar Irradiance</button>
+            <button style={{
+              backgroundColor: currentDataset === datasets.transposed_temp ? "#6CA0DC" : "white",
+              color: currentDataset === datasets.transposed_temp ? "white" : "black",
+              marginRight: "5px",
+            }} onClick={() => setCurrentDataset(datasets.transposed_temp)}>Temperature</button>
+            <button style={{
+              backgroundColor: currentDataset === datasets.transposed_precip ? "#6CA0DC" : "white",
+              color: currentDataset === datasets.transposed_precip ? "white" : "black",
+              marginRight: "5px",
+            }} onClick={() => setCurrentDataset(datasets.transposed_precip)}>Precipitation</button>
+            <button style={{
+              backgroundColor: currentDataset === datasets.transposed_irrad ? "#6CA0DC" : "white",
+              color: currentDataset === datasets.transposed_irrad ? "white" : "black",
+            }} onClick={() => setCurrentDataset(datasets.transposed_irrad)}>Solar Irradiance</button>
           </>
         )}
       </div>
+      {currentDataset && (
+        <div>
+          <label style={{ padding: "5px" }}>
+            Year 1:
+            <select style={{ marginLeft: "10px" }} value={year1 || ''} onChange={(e) => setYear1(parseInt(e.target.value))}>
+              {Array.from(new Set(currentDataset.map((row) => row.Year))).map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label style={{ padding: "5px" }}>
+            Year 2:
+            <select style={{ marginLeft: "10px" }} value={year2 || ''} onChange={(e) => setYear2(parseInt(e.target.value))}>
+              {Array.from(new Set(currentDataset.map((row) => row.Year))).map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
     </div>
   );
 }
