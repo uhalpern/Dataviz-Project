@@ -77,7 +77,10 @@ function DualPlot() {
       width: 1200,
       height: 500,
       margin: { t: 40, r: 40, b: 40, l: 40 },
-      title: `${currentDataset[0].Parameter} Density Map Comparison`,
+      title: {
+        text: `${currentDataset[0].Parameter} Density Map Comparison`,
+        font: {size: 26}
+      },
       updatemenus: updateMenu,
       annotations: annotations,
       grid: {

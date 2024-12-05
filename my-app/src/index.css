@@ -67,3 +67,27 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* style.css */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px; /* Adds spacing between the plot and the buttons */
+}
+
+.plot-button {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  width: 150px; /* Consistent button width */
+}
+
+.plot-button img {
+  height: 16px;
+  margin-right: 10px; /* Adds spacing between the image and text */
+}
+

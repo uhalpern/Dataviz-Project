@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Plotly from 'plotly.js-dist';
 import { loadAndProcessData } from './ProcessData.js';
 import { get_globalLatLons, generateSteps} from './plot_helper_functions.js';
@@ -9,8 +9,25 @@ import { getMinMax } from './data_helper_functions.js';
 function Plot() {
   const plotDiv = useRef(null);
 
+  const [datasets, setDatasets] = useState(null);
+  const [currentDataset, setCurrentDataset] = useState(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      const loadedDatasets = await loadAndProcessData();
+      setDatasets(loadedDatasets);
+      setCurrentDataset(loadedDatasets.transposed_temp); // Default dataset
+
+      let steps = generateSteps(currentDataset);
+
+    }
+
+    fetchData();
+  }, []);
+
   useEffect(() => {
     async function fetchDataAndRenderPlot() {
+      if (!currentDataset) return; // Prevent running before the dataset is set
       // Fetch datasets
       const variableButtonHeight = 1.0;
       const variableButtonWidth = 0;
@@ -23,21 +40,12 @@ function Plot() {
       const global_lat_lons = get_globalLatLons(datasets.transposed_temp);
       //console.log("lat_lons:")
       //console.log(global_lat_lons);
-      const currentDataset = datasets.transposed_temp;
       const currentMinMax = getMinMax(currentDataset);
-      const precipMinMax = getMinMax(datasets.transposed_precip);
-      const irradMinMax = getMinMax(datasets.transposed_irrad);
-
-      //let specific_year = currentDataset.filter(row => row.Year === 1994);
-      //console.log("specific year (1994):");
-      //console.log(specific_year);
-
       let steps = generateSteps(currentDataset);
 
-      const annotations = createAnnotations(variableButtonHeight, variableButtonWidth,
-        colorscaleButtonHeight, colorscaleButtonWidth)
+      const annotations = createAnnotations(colorscaleButtonHeight, colorscaleButtonWidth)
 
-      const updateMenu = createUpdateMenus(datasets, precipMinMax, variableButtonHeight, colorscaleButtonWidth, colorscaleButtonHeight);
+      const updateMenu = createUpdateMenus(datasets, colorscaleButtonWidth, colorscaleButtonHeight);
 
       const baseSliderConfig = {
         len: 0.8,
@@ -58,7 +66,7 @@ function Plot() {
         z: currentDataset[0].Data.map(row => row.Value), // Initial z values
         colorscale: 'Portland', // Consistent colorscale
         radius: 50,
-        opacity: 0.4,
+        opacity: 0.5,
         zmin: currentMinMax.zmin, // Explicit minimum for colorscale
         zmax: currentMinMax.zmax // Explicit maximum for colorscale
       }];
@@ -69,7 +77,7 @@ function Plot() {
           text: `${currentDataset[0].Parameter} Density Map`,
           font: {
             family: 'Helvetica, sans-serif', // Choose one of the fonts
-            size: 24,
+            size: 28,
             color: '#333' // Adjust the color if needed
           },
         },
@@ -90,20 +98,78 @@ function Plot() {
           steps: steps // Use the dynamically generated steps
         }],
         annotations: annotations,
-        updatemenus: updateMenu,
       };
 
       // Render the plot in the referenced div
-      Plotly.newPlot(plotDiv.current, data, layout);
+      Plotly.react(plotDiv.current, data, layout);
     }
 
     fetchDataAndRenderPlot();
-  }, []);
+  }, [currentDataset]); // Add currentDataset as a dependency
 
   return (
     <div>
       {/* div to hold the Plotly plot */}
-      <div ref={plotDiv} />
+      <div style={{ display: "flex", alignItems: "flex-start" }}>
+        {/* Plot container */}
+        <div
+          ref={plotDiv}
+          style={{
+            flex: 1, // Makes the plot container take up most of the available space
+          }}
+        />
+
+        {/* Button container */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginLeft: "20px", // Adds spacing between the plot and the buttons
+          }}
+        >
+          <button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              backgroundColor: "white",
+              border: "1px solid #ccc",
+              padding: "5px 10px",
+              cursor: "pointer",
+              marginBottom: "10px",
+              width: "150px", // Set a fixed width for consistency
+            }}
+            onClick={() => Plotly.restyle(plotDiv.current, { colorscale: "Viridis" })}
+          >
+            <img
+              src="/viridis.png" // Adjust the path to match your public directory
+              alt="Viridis"
+              style={{ height: "16px", marginRight: "10px" }}
+            />
+            Viridis
+          </button>
+          {/* Add more buttons as needed */}
+        </div>
+      </div>
+      <div style={{ padding: "5px", marginRight: "180px"}}>
+        {datasets && (
+          <>
+            <button style={{
+              backgroundColor: currentDataset === datasets.transposed_temp ? "#6CA0DC" : "white",
+              color: currentDataset === datasets.transposed_temp ? "white" : "black",
+              marginRight: "5px",
+            }} onClick={() => setCurrentDataset(datasets.transposed_temp)}>Temperature</button>
+            <button style={{
+              backgroundColor: currentDataset === datasets.transposed_precip ? "#6CA0DC" : "white",
+              color: currentDataset === datasets.transposed_precip ? "white" : "black",
+              marginRight: "5px",
+            }} onClick={() => setCurrentDataset(datasets.transposed_precip)}>Precipitation</button>
+            <button style={{
+              backgroundColor: currentDataset === datasets.transposed_irrad ? "#6CA0DC" : "white",
+              color: currentDataset === datasets.transposed_irrad ? "white" : "black",
+            }} onClick={() => setCurrentDataset(datasets.transposed_irrad)}>Solar Irradiance</button>
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -26,7 +26,7 @@ function App() {
         style={{
           display: 'flex',
           flexDirection: 'column',   // Stack items vertically (header above plot)
-          marginTop: "200px",
+          marginTop: "50px",
           alignItems: 'center',     // Vertically centers content
           minHeight: '100vh',       // Ensures full viewport height for centering
           textAlign: 'center',      // Centers text horizontally inside the container

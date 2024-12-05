@@ -11,91 +11,9 @@ const baseSliderConfig = {
   x: 0.1,
 };
 
-export function createUpdateMenus(datasets, precipMinMax, variableButtonHeight, colorscaleButtonWidth, colorscaleButtonHeight) {
+export function createUpdateMenus(datasets, colorscaleButtonWidth, colorscaleButtonHeight) {
 
-  console.log("datasets in updatemenu");
-  console.log(datasets);
   const updateMenu =  [
-    {
-      buttons: [
-        {
-          method: 'update',
-          args: [
-            {
-              lon: [datasets.transposed_temp[0].Data.map(row => row.LON)],
-              lat: [datasets.transposed_temp[0].Data.map(row => row.LAT)],
-              z: [datasets.transposed_temp[0].Data.map(row => row.Value)],
-              zmin: getMinMax(datasets.transposed_temp).zmin,
-              zmax: getMinMax(datasets.transposed_temp).zmax,
-            },
-            {
-              title: `${datasets.transposed_temp[0].Parameter} Density Map`,
-              sliders: [
-                {
-                  ...baseSliderConfig, // Spread the base styling so that only below params get updated
-                  active: 0,
-                  steps: generateSteps(datasets.transposed_temp),
-                },
-              ],
-            },
-          ],
-          label: 'Temperature',
-        },
-        {
-          method: 'update',
-          args: [
-            {
-              lon: [datasets.transposed_precip[0].Data.map(row => row.LON)],
-              lat: [datasets.transposed_precip[0].Data.map(row => row.LAT)],
-              z: [datasets.transposed_precip[0].Data.map(row => row.Value)],
-              zmin: precipMinMax.zmin,
-              zmax: precipMinMax.zmax,
-            },
-            {
-              title: `${datasets.transposed_precip[0].Parameter} Density Map`,
-              sliders: [
-                {
-                  ...baseSliderConfig, // Spread the base styling so that only below params get updated
-                  active: 0,
-                  steps: generateSteps(datasets.transposed_precip),
-                },
-              ],
-            },
-          ],
-          label: 'Precipitation',
-        },
-        {
-          method: 'update',
-          args: [
-            {
-              lon: [datasets.transposed_irrad[0].Data.map(row => row.LON)],
-              lat: [datasets.transposed_irrad[0].Data.map(row => row.LAT)],
-              z: [datasets.transposed_irrad[0].Data.map(row => row.Value)],
-              zmin: getMinMax(datasets.transposed_irrad).zmin,
-              zmax: getMinMax(datasets.transposed_irrad).zmax,
-            },
-            {
-              title: `${datasets.transposed_irrad[0].Parameter} Density Map`,
-              sliders: [
-                {
-                  ...baseSliderConfig, // Spread the base styling so that only below params get updated
-                  active: 0,
-                  steps: generateSteps(datasets.transposed_irrad),
-                },
-              ],
-            },
-          ],
-          label: 'Solar Irradiance',
-        },
-      ],
-      direction: 'down',
-      type: 'dropdown',
-      showactive: true,
-      x: 0,
-      xanchor: 'left',
-      y: variableButtonHeight,
-      yanchor: 'top',
-    },
     {
       buttons: [
         { args: ['colorscale', 'Viridis'], label: 'Viridis', method: 'restyle' },
