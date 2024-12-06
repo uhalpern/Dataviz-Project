@@ -73,6 +73,7 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   margin-left: 20px; /* Adds spacing between the plot and the buttons */
+  margin-top: 50px;
 }
 
 .plot-button {
@@ -91,3 +92,8 @@ button:focus-visible {
   margin-right: 10px; /* Adds spacing between the image and text */
 }
 
+.plot-button.selected {
+  background-color: #6CA0DC; /* Highlight color for selected button */
+  color: white; /* Text color for contrast */
+  border-color: #4A89C7; /* Border color to match the selected style */
+}

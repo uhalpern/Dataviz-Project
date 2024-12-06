@@ -5,6 +5,7 @@ import { get_globalLatLons, generateSteps } from './plot_helper_functions.js';
 import { createdualAnnotations } from './dualannotations';
 import { getMinMax } from './data_helper_functions.js';
 import { createDualUpdateMenus } from './dualupdateMenus.js';
+import { buttonConfigs } from "./colorscaleButtonConfig.js";
 
 function DualPlot() {
   const plotDiv = useRef(null);
@@ -13,6 +14,7 @@ function DualPlot() {
   const [currentDataset, setCurrentDataset] = useState(null);
   const [year1, setYear1] = useState(null);
   const [year2, setYear2] = useState(null);
+  const [selectedColorscale, setSelectedColorscale] = useState('Portland'); // Default colorscale
 
   useEffect(() => {
     async function fetchData() {
@@ -36,7 +38,7 @@ function DualPlot() {
     const selectedYear1 = currentDataset.filter((row) => row.Year === year1);
     const selectedYear2 = currentDataset.filter((row) => row.Year === year2);
 
-    const updateMenu = createDualUpdateMenus(1.12, 0.9);
+    //const updateMenu = createDualUpdateMenus(1.12, 0.9);
     const annotations = createdualAnnotations(
       0.9,
       1.12,
@@ -50,7 +52,7 @@ function DualPlot() {
         lon: selectedYear1[0].Data.map((row) => row.LON),
         lat: selectedYear1[0].Data.map((row) => row.LAT),
         z: selectedYear1[0].Data.map((row) => row.Value),
-        colorscale: 'Viridis',
+        colorscale: selectedColorscale,
         radius: 50,
         opacity: 0.4,
         zmin: currentMinMax.zmin,
@@ -63,7 +65,7 @@ function DualPlot() {
         lon: selectedYear2[0].Data.map((row) => row.LON),
         lat: selectedYear2[0].Data.map((row) => row.LAT),
         z: selectedYear2[0].Data.map((row) => row.Value),
-        colorscale: 'Viridis',
+        colorscale: selectedColorscale,
         radius: 50,
         opacity: 0.4,
         zmin: currentMinMax.zmin,
@@ -74,14 +76,14 @@ function DualPlot() {
     ];
 
     const layout = {
-      width: 1200,
-      height: 500,
+      width: 1000,
+      height: 455,
       margin: { t: 40, r: 40, b: 40, l: 40 },
       title: {
         text: `${currentDataset[0].Parameter} Density Map Comparison`,
         font: {size: 26}
       },
-      updatemenus: updateMenu,
+      //updatemenus: updateMenu,
       annotations: annotations,
       grid: {
         rows: 1,
@@ -95,7 +97,7 @@ function DualPlot() {
           lat: global_lat_lons.lat.reduce((sum, lat) => sum + lat, 0) / global_lat_lons.lat.length,
           lon: global_lat_lons.lon.reduce((sum, lon) => sum + lon, 0) / global_lat_lons.lon.length,
         },
-        zoom: 5.0,
+        zoom: 5.05,
       },
       mapbox2: {
         style: 'open-street-map',
@@ -104,17 +106,45 @@ function DualPlot() {
           lat: global_lat_lons.lat.reduce((sum, lat) => sum + lat, 0) / global_lat_lons.lat.length,
           lon: global_lat_lons.lon.reduce((sum, lon) => sum + lon, 0) / global_lat_lons.lon.length,
         },
-        zoom: 5.0,
+        zoom: 5.05,
       },
     };
 
     Plotly.newPlot(plotDiv.current, data, layout);
-  }, [currentDataset, year1, year2]);
+  }, [currentDataset, year1, year2, selectedColorscale]);
+
+  const renderButtons = () =>
+    buttonConfigs.map((button, index) => (
+      <button
+        key={index}
+        className={`plot-button ${button.colorscale === selectedColorscale ? "selected" : ""}`} // Add 'selected' class conditionally
+        onClick={() => setSelectedColorscale(button.colorscale)}
+      >
+        <img
+          src={button.imgSrc}
+          alt={button.alt}
+        />
+        {button.label}
+      </button>
+    ));
 
   return (
     <div>
-      <div ref={plotDiv} style={{ minHeight: '500px', minWidth: '900px' }} />
-      <div style={{ padding: "5px"}}>
+      <div style={{ display: "flex", alignItems: "flex-start" }}>
+        {/* Plot container */}
+        <div
+          ref={plotDiv}
+          style={{
+            flex: 1, // Makes the plot container take up most of the available space
+          }}
+        />
+        {/* Button container */}
+        <div className="button-container">
+          Choose Colorscale:
+          {renderButtons()}
+        </div>
+      </div>
+      <div style={{ padding: "5px", marginRight: "200px"}}>
         {datasets && (
           <>
             <button style={{
@@ -135,7 +165,7 @@ function DualPlot() {
         )}
       </div>
       {currentDataset && (
-        <div>
+        <div style={{ padding: "5px", marginRight: "200px"}}>
           <label style={{ padding: "5px" }}>
             Year 1:
             <select style={{ marginLeft: "10px" }} value={year1 || ''} onChange={(e) => setYear1(parseInt(e.target.value))}>

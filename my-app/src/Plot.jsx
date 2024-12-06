@@ -5,12 +5,14 @@ import { get_globalLatLons, generateSteps} from './plot_helper_functions.js';
 import { createAnnotations } from './annotations';
 import { createUpdateMenus } from './updateMenus';
 import { getMinMax } from './data_helper_functions.js';
+import { buttonConfigs } from "./colorscaleButtonConfig.js";
 
 function Plot() {
   const plotDiv = useRef(null);
 
   const [datasets, setDatasets] = useState(null);
   const [currentDataset, setCurrentDataset] = useState(null);
+  const [selectedColorscale, setSelectedColorscale] = useState('Portland'); // Default colorscale
 
   useEffect(() => {
     async function fetchData() {
@@ -43,9 +45,9 @@ function Plot() {
       const currentMinMax = getMinMax(currentDataset);
       let steps = generateSteps(currentDataset);
 
-      const annotations = createAnnotations(colorscaleButtonHeight, colorscaleButtonWidth)
+      //const annotations = createAnnotations(colorscaleButtonHeight, colorscaleButtonWidth)
 
-      const updateMenu = createUpdateMenus(datasets, colorscaleButtonWidth, colorscaleButtonHeight);
+      //const updateMenu = createUpdateMenus(datasets, colorscaleButtonWidth, colorscaleButtonHeight);
 
       const baseSliderConfig = {
         len: 0.8,
@@ -64,8 +66,8 @@ function Plot() {
         lon: currentDataset[0].Data.map(row => row.LON),
         lat: currentDataset[0].Data.map(row => row.LAT),
         z: currentDataset[0].Data.map(row => row.Value), // Initial z values
-        colorscale: 'Portland', // Consistent colorscale
-        radius: 50,
+        colorscale: selectedColorscale, // Consistent colorscale
+        radius: 65,
         opacity: 0.5,
         zmin: currentMinMax.zmin, // Explicit minimum for colorscale
         zmax: currentMinMax.zmax // Explicit maximum for colorscale
@@ -87,9 +89,9 @@ function Plot() {
             lat: global_lat_lons.lat.reduce((sum, lat) => sum + lat, 0) / global_lat_lons.lat.length, // Calculate the center latitude
             lon: global_lat_lons.lon.reduce((sum, lon) => sum + lon, 0) / global_lat_lons.lon.length  // Calculate the center longitude
           },
-          zoom: 5.0
+          zoom: 5.4
         },
-        width: 900, // Width of the plot in pixels
+        width: 600, // Width of the plot in pixels
         height: 500, // Height of the plot in pixels
         margin: { t: 40, r: 0, b: 0, l: 0 },
         sliders: [{
@@ -97,7 +99,7 @@ function Plot() {
           active: 0,
           steps: steps // Use the dynamically generated steps
         }],
-        annotations: annotations,
+        //annotations: annotations,
       };
 
       // Render the plot in the referenced div
@@ -105,7 +107,22 @@ function Plot() {
     }
 
     fetchDataAndRenderPlot();
-  }, [currentDataset]); // Add currentDataset as a dependency
+  }, [currentDataset, selectedColorscale]); // Add currentDataset as a dependency
+
+  const renderButtons = () =>
+    buttonConfigs.map((button, index) => (
+      <button
+        key={index}
+        className={`plot-button ${button.colorscale === selectedColorscale ? "selected" : ""}`} // Add 'selected' class conditionally
+        onClick={() => setSelectedColorscale(button.colorscale)}
+      >
+        <img
+          src={button.imgSrc}
+          alt={button.alt}
+        />
+        {button.label}
+      </button>
+    ));
 
   return (
     <div>
@@ -118,36 +135,10 @@ function Plot() {
             flex: 1, // Makes the plot container take up most of the available space
           }}
         />
-
         {/* Button container */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            marginLeft: "20px", // Adds spacing between the plot and the buttons
-          }}
-        >
-          <button
-            style={{
-              display: "flex",
-              alignItems: "center",
-              backgroundColor: "white",
-              border: "1px solid #ccc",
-              padding: "5px 10px",
-              cursor: "pointer",
-              marginBottom: "10px",
-              width: "150px", // Set a fixed width for consistency
-            }}
-            onClick={() => Plotly.restyle(plotDiv.current, { colorscale: "Viridis" })}
-          >
-            <img
-              src="/viridis.png" // Adjust the path to match your public directory
-              alt="Viridis"
-              style={{ height: "16px", marginRight: "10px" }}
-            />
-            Viridis
-          </button>
-          {/* Add more buttons as needed */}
+        <div className="button-container">
+          Choose Colorscale:
+          {renderButtons()}
         </div>
       </div>
       <div style={{ padding: "5px", marginRight: "180px"}}>
