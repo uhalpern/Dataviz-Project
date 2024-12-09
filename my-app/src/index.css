@@ -97,3 +97,26 @@ button:focus-visible {
   color: white; /* Text color for contrast */
   border-color: #4A89C7; /* Border color to match the selected style */
 }
+
+/* General button styles */
+.custom-button {
+  background-color: white;
+  color: black;
+  margin-right: 5px;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Active state for buttons */
+.custom-button.active {
+  background-color: #6CA0DC;
+  color: white;
+}
+
+/* Hover effect */
+.custom-button:hover {
+  background-color: #b0cde8;
+  color: black;
+}

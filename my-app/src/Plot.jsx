@@ -144,20 +144,24 @@ function Plot() {
       <div style={{ padding: "5px", marginRight: "180px"}}>
         {datasets && (
           <>
-            <button style={{
-              backgroundColor: currentDataset === datasets.transposed_temp ? "#6CA0DC" : "white",
-              color: currentDataset === datasets.transposed_temp ? "white" : "black",
-              marginRight: "5px",
-            }} onClick={() => setCurrentDataset(datasets.transposed_temp)}>Temperature</button>
-            <button style={{
-              backgroundColor: currentDataset === datasets.transposed_precip ? "#6CA0DC" : "white",
-              color: currentDataset === datasets.transposed_precip ? "white" : "black",
-              marginRight: "5px",
-            }} onClick={() => setCurrentDataset(datasets.transposed_precip)}>Precipitation</button>
-            <button style={{
-              backgroundColor: currentDataset === datasets.transposed_irrad ? "#6CA0DC" : "white",
-              color: currentDataset === datasets.transposed_irrad ? "white" : "black",
-            }} onClick={() => setCurrentDataset(datasets.transposed_irrad)}>Solar Irradiance</button>
+            <button
+              className={`custom-button ${currentDataset === datasets.transposed_temp ? "active" : ""}`}
+              onClick={() => setCurrentDataset(datasets.transposed_temp)}
+            >
+              Temperature
+            </button>
+            <button
+              className={`custom-button ${currentDataset === datasets.transposed_precip ? "active" : ""}`}
+              onClick={() => setCurrentDataset(datasets.transposed_precip)}
+            >
+              Precipitation
+            </button>
+            <button
+              className={`custom-button ${currentDataset === datasets.transposed_irrad ? "active" : ""}`}
+              onClick={() => setCurrentDataset(datasets.transposed_irrad)}
+            >
+              Solar Irradiance
+            </button>
           </>
         )}
       </div>

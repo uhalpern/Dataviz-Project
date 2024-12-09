@@ -22,6 +22,11 @@ function App() {
     <Container fluid style={{ padding: 0 }}>
       <NavbarComponent setIsDualPlot={setIsDualPlot} />
       <h1 style={{marginTop: "40px"}}>Climate Variable Visualizer</h1>
+      <Container style={{ padding: 5, marginTop: "50px"}}>
+        <p>
+          This webpage visualizes weather and meteorological data from NASA’s MERRA-2 system. MERRA-2 operates at a high spatial resolution of 0.58° x 0.625° and improves on earlier atmosphere reanalysis systems by integrating advanced satellite data and filling observational gaps. It provides reliable data for atmospheric research, energy, and agriculture. The visualization below features an orthophoto heat map of the Hawaiian Islands and nearby ocean, showcasing climatology parameters like temperature, precipitation, and solar irradiance from 1984 to 2024. Gaps in the heatmap were filled using kernel density estimation to ensure smooth and continuous data representation.
+        </p>
+      </Container>
       <Container
         style={{
           display: 'flex',
